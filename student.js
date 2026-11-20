@@ -1,34 +1,24 @@
-let students = [
-    {
-        id: "student1",
-        password: "1234"
-    },
-    {
-        id: "anish",
-        password: "abcd"
-    }
+const students = [
+    { id: "student1", password: "1234", name: "Student" },
+    { id: "anish", password: "abcd", name: "Anish" }
 ];
 
-let form = document.querySelector(".login-form");
+const form = document.querySelector(".login-form");
 
 form.addEventListener("submit", function (event) {
-
     event.preventDefault();
 
-    let id = document.querySelector("#email").value;
-    let password = document.querySelector("#password").value;
+    const id = document.querySelector("#email").value.trim().toLowerCase();
+    const password = document.querySelector("#password").value;
 
-    let user = students.find(function (student) {
-        return student.id === id && student.password === password;
-    });
+    const user = students.find(s => s.id === id && s.password === password);
 
     if (user) {
-        alert("Login successful!");
-
-        window.location.href = "student-dashboard.html";
-    }
-    else {
+        // Remember the session so the dashboard knows who is logged in
+        localStorage.setItem("prepdeck_logged_in", "true");
+        localStorage.setItem("prepdeck_student_name", user.name);
+        window.location.href = "dashboard.html";   // same folder as this page
+    } else {
         alert("Invalid ID or Password!");
     }
-
 });

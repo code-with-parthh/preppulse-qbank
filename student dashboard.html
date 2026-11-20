@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard | PrepDeck</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/student dashboard.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Sidebar: offcanvas on mobile, fixed on desktop -->
+  <aside class="sidebar offcanvas-lg offcanvas-start" id="sidebar" tabindex="-1">
+    <div class="brand"><span class="brand-mark"><i class="bi bi-layers-fill"></i></span>PrepDeck
+      <button class="btn-close d-lg-none ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"
+        aria-label="Close"></button>
+    </div>
+    <nav class="nav-list">
+      <a href="#dashboard" class="nav-item-pd active" data-view="dashboard"><i class="bi bi-grid-1x2"></i>Dashboard</a>
+      <a href="question-bank.html" class="nav-item-pd"><i class="bi bi-journal-text"></i>Question Bank</a>
+      <a href="#progress" class="nav-item-pd" data-view="progress"><i class="bi bi-graph-up-arrow"></i>My Progress</a>
+      <a href="#bookmarks" class="nav-item-pd" data-view="bookmarks"><i class="bi bi-bookmark"></i>Bookmarks</a>
+      <a href="settings.html" class="nav-item-pd"><i class="bi bi-gear"></i>Settings</a>
+    </nav>
+    <a href="../student-login.html" class="nav-item-pd logout" data-logout><i
+        class="bi bi-box-arrow-left"></i>Logout</a>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Open menu"><i
+          class="bi bi-list"></i></button>
+      <form class="search" id="searchForm" role="search" autocomplete="off">
+        <i class="bi bi-search"></i>
+        <input type="search" id="searchInput" placeholder="Search interview questions" aria-label="Search questions">
+        <div class="search-results d-none" id="searchResults"></div>
+      </form>
+      <div class="dropdown ms-auto">
+        <button class="icon-btn position-relative" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+          aria-label="Notifications">
+          <i class="bi bi-bell"></i><span class="dot" id="notifDot"></span></button>
+        <div class="dropdown-menu dropdown-menu-end pd-menu notif" id="notifMenu"></div>
+      </div>
+      <div class="dropdown">
+        <button class="profile" data-bs-toggle="dropdown"><span class="avatar" id="avatar">S</span>
+          <span class="d-none d-md-inline name" id="studentName">Student</span><i
+            class="bi bi-chevron-down small d-none d-md-inline"></i></button>
+        <ul class="dropdown-menu dropdown-menu-end pd-menu">
+          <li><a class="dropdown-item" href="settings.html"><i class="bi bi-person"></i>My profile</a></li>
+          <li><a class="dropdown-item" href="#bookmarks" data-view="bookmarks"><i
+                class="bi bi-bookmark"></i>Bookmarks</a></li>
+          <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear"></i>Settings</a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" href="../student-login.html" data-logout><i
+                class="bi bi-box-arrow-left"></i>Logout</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Dashboard view -->
+      <div id="view-dashboard" class="view">
+        <section class="welcome" id="progress-top">
+          <div>
+            <p class="date" id="todayDate"></p>
+            <h1>Welcome back, <span id="welcomeName">Student</span>!</h1>
+            <p class="sub">Ready to improve your interview skills today? A few focused questions a day add up fast.</p>
+          </div>
+          <a href="question-bank.html" class="btn btn-pd">Start Practicing</a>
+        </section>
+
+        <section class="row g-3 stats" id="stats"></section>
+
+        <div class="row g-3 mt-1">
+          <div class="col-xl-8">
+            <section class="card-pd" id="learning">
+              <h2>Your Learning Progress</h2>
+              <div id="learningBody"></div>
+            </section>
+            <section class="card-pd mt-3">
+              <h2>Category Progress</h2>
+              <div class="row g-3" id="categories"></div>
+            </section>
+          </div>
+          <div class="col-xl-4">
+            <section class="card-pd">
+              <h2>Daily Practice Goal</h2>
+              <div id="goalBody"></div>
+            </section>
+            <section class="card-pd mt-3">
+              <h2>Recent Activity</h2>
+              <ul class="activity" id="activity"></ul>
+            </section>
+          </div>
+        </div>
+
+        <section class="mt-4">
+          <h2 class="section-title">Recommended for You</h2>
+          <div class="row g-3" id="recommended"></div>
+        </section>
+      </div>
+
+      <!-- Bookmarks view -->
+      <div id="view-bookmarks" class="view d-none">
+        <h1 class="page-title">Bookmarks</h1>
+        <div class="row g-3" id="bookmarkList"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-wrap">
+    <div id="toast" class="toast pd-toast" role="status">
+      <div class="toast-body" id="toastMsg"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="student dashboard.js"></script>
+</body>
+
+</html>
