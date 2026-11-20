@@ -17,7 +17,7 @@ form.addEventListener("submit", function (event) {
         // Remember the session so the dashboard knows who is logged in
         localStorage.setItem("prepdeck_logged_in", "true");
         localStorage.setItem("prepdeck_student_name", user.name);
-        window.location.href = "dashboard.html";   // same folder as this page
+        window.location.href = "student dashboard.html";  // same folder as this page
     } else {
         alert("Invalid ID or Password!");
     }
