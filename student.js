@@ -1,6 +1,5 @@
 const students = [
     { id: "student1", password: "1234", name: "Student" },
-    { id: "anish", password: "abcd", name: "Anish" }
 ];
 
 const form = document.querySelector(".login-form");
