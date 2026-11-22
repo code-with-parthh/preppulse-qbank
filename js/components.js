@@ -7,6 +7,11 @@
   const esc = s => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   function renderDemoBar() {
+    // Never inject demo bar on public landing page or dedicated login pages
+    const path = (window.location.pathname || '').toLowerCase();
+    if (path.endsWith('index.html') || path === '/' || path.endsWith('/') || path.includes('login')) {
+      return;
+    }
     if (document.getElementById('demoRoleBanner')) return;
 
     const session = Storage.getSession();
