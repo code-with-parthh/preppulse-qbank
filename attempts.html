@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Attempts & Submissions | PrepDeck</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/student-dashboard.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar offcanvas-lg offcanvas-start" id="sidebar" tabindex="-1">
+    <div class="brand">
+      <span class="brand-mark"><i class="bi bi-layers-fill"></i></span>PrepDeck
+      <button class="btn-close d-lg-none ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
+    </div>
+    <nav class="nav-list">
+      <a href="student-dashboard.html" class="nav-item-pd">
+        <i class="bi bi-grid-1x2"></i>Overview
+      </a>
+      <a href="question-bank.html" class="nav-item-pd">
+        <i class="bi bi-journal-text"></i>Question Bank
+      </a>
+      <a href="attempts.html" class="nav-item-pd active">
+        <i class="bi bi-clock-history"></i>My Attempts
+        <span class="badge bg-warning text-dark ms-auto unread-comment-count d-none">0</span>
+      </a>
+      <a href="student-dashboard.html#progress" class="nav-item-pd">
+        <i class="bi bi-graph-up-arrow"></i>My Progress
+      </a>
+      <a href="student-dashboard.html#bookmarks" class="nav-item-pd">
+        <i class="bi bi-bookmark"></i>Bookmarks
+      </a>
+      <a href="student-dashboard.html#settings" class="nav-item-pd">
+        <i class="bi bi-gear"></i>Settings
+      </a>
+    </nav>
+    <a href="student-login.html" class="nav-item-pd logout mt-auto" data-logout>
+      <i class="bi bi-box-arrow-left"></i>Sign Out
+    </a>
+  </aside>
+
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="icon-btn d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Open menu">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="name text-decoration-none text-dark fw-bold" href="student-dashboard.html">PrepDeck Practice Workspace</a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="text-muted small d-none d-md-inline" id="studentDisplay">Student</span>
+        <a href="question-bank.html" class="btn btn-pd btn-sm"><i class="bi bi-plus-circle"></i> Practice a Question</a>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Page Header -->
+      <section class="welcome mb-3">
+        <div>
+          <p class="date">SUBMISSION HISTORY</p>
+          <h1>My Practice Attempts</h1>
+          <p class="sub">All your written solutions, recorded times, versions, and mentor reviews are organized here.</p>
+        </div>
+        <div class="stat">
+          <div>
+            <p class="stat-label">Total Submissions</p>
+            <p class="stat-num" id="totalAttemptsNum">0</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filter Controls -->
+      <section class="card-pd mb-4 shadow-sm">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-muted" for="statusFilter">Filter by Review Status</label>
+            <select id="statusFilter" class="form-select form-select-sm">
+              <option value="all">All Review Statuses</option>
+              <option value="awaiting">Awaiting Mentor Review</option>
+              <option value="approved">Approved</option>
+              <option value="needs_revision">Needs Revision</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-muted" for="topicFilter">Filter by Topic</label>
+            <select id="topicFilter" class="form-select form-select-sm">
+              <option value="all">All Topics (8)</option>
+            </select>
+          </div>
+          <div class="col-md-4 text-md-end pt-md-3">
+            <span class="text-muted small" id="attemptCountSummary">Showing attempts</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Attempts Table (PRD S5) -->
+      <div class="card-pd p-0 overflow-hidden shadow-sm">
+        <div class="table-responsive">
+          <table class="table-pd mb-0">
+            <thead>
+              <tr>
+                <th>Question & Topic</th>
+                <th>My Status</th>
+                <th>Time Taken</th>
+                <th>Confidence</th>
+                <th>Review Status</th>
+                <th>Mentor Feedback</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody id="attemptsTableBody">
+              <tr>
+                <td colspan="7" class="text-center py-4 text-muted">Loading your attempts...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-wrap">
+    <div id="toast" class="toast pd-toast" role="status">
+      <div class="toast-body" id="toastMsg"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const esc = Components.esc;
+      const currentUser = Storage.getCurrentUser();
+      if (!currentUser || currentUser.role !== 'student') {
+        window.location.href = 'student-login.html';
+        return;
+      }
+
+      document.getElementById('studentDisplay').textContent = `${currentUser.name} (Student)`;
+
+      // Populate topic filter
+      const topicFilter = document.getElementById('topicFilter');
+      Storage.getTopics().forEach(t => {
+        topicFilter.insertAdjacentHTML('beforeend', `<option value="${esc(t)}">${esc(t)}</option>`);
+      });
+
+      function renderAttempts() {
+        const attempts = Storage.getAttempts(currentUser.id);
+        const statusFilter = document.getElementById('statusFilter').value;
+        const topicFilterVal = document.getElementById('topicFilter').value;
+
+        let filtered = attempts.filter(a => {
+          if (statusFilter !== 'all' && a.reviewStatus !== statusFilter) return false;
+          if (topicFilterVal !== 'all') {
+            const q = Storage.getQuestionById(a.questionId);
+            if (!q || q.topic !== topicFilterVal) return false;
+          }
+          return true;
+        });
+
+        document.getElementById('totalAttemptsNum').textContent = attempts.length;
+        document.getElementById('attemptCountSummary').textContent = `Showing ${filtered.length} of ${attempts.length} attempts`;
+
+        const tbody = document.getElementById('attemptsTableBody');
+        if (!filtered.length) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <div class="text-muted mb-2"><i class="bi bi-clock-history" style="font-size:2rem;"></i></div>
+                <p class="text-muted mb-2">No attempts found matching the selected filter.</p>
+                <a href="question-bank.html" class="btn btn-pd btn-sm">Start a Practice Attempt</a>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(a => {
+          const q = Storage.getQuestionById(a.questionId);
+          const comments = Storage.getComments(a.id);
+          const unreadComments = comments.filter(c => !c.readByStudent).length;
+
+          let reviewBadge = '';
+          if (a.reviewStatus === 'approved') {
+            reviewBadge = '<span class="badge-status badge-status-approved"><i class="bi bi-check-circle-fill"></i> Approved</span>';
+          } else if (a.reviewStatus === 'needs_revision') {
+            reviewBadge = '<span class="badge-status badge-status-needs_revision"><i class="bi bi-exclamation-triangle-fill"></i> Needs Revision</span>';
+          } else {
+            reviewBadge = '<span class="badge-status badge-status-awaiting"><i class="bi bi-hourglass-split"></i> Awaiting Review</span>';
+          }
+
+          const versionCount = a.versions ? a.versions.length : 1;
+          const mins = Math.round((a.timeTakenSec || 60) / 60);
+
+          return `
+            <tr>
+              <td>
+                <div class="fw-bold">${q ? esc(q.title) : 'Question'}</div>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <span class="tag">${q ? esc(q.topic) : ''}</span>
+                  <span class="tag d-${q ? q.difficulty : 'Medium'}">${q ? q.difficulty : ''}</span>
+                  <span class="badge bg-light text-muted border">v${versionCount}</span>
+                </div>
+              </td>
+              <td>
+                <span class="badge-status badge-status-${a.status}">${a.status}</span>
+              </td>
+              <td class="font-monospace">${mins} min</td>
+              <td>
+                <span class="text-warning fw-bold">${'★'.repeat(a.confidence || 3)}</span>
+                <span class="text-muted small">(${a.confidence || 3}/5)</span>
+              </td>
+              <td>${reviewBadge}</td>
+              <td>
+                ${comments.length > 0 ? `
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="small text-dark fw-bold">${comments.length} comment${comments.length === 1 ? '' : 's'}</span>
+                    ${unreadComments > 0 ? `<span class="badge bg-danger">${unreadComments} new</span>` : ''}
+                  </div>
+                ` : '<span class="text-muted small">No comments yet</span>'}
+              </td>
+              <td class="text-end">
+                <a href="submission.html?id=${encodeURIComponent(a.id)}" class="btn btn-pd btn-sm">
+                  View Submission →
+                </a>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('statusFilter').addEventListener('change', renderAttempts);
+      document.getElementById('topicFilter').addEventListener('change', renderAttempts);
+
+      renderAttempts();
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Dashboard | PrepDeck</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/student-dashboard.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Sidebar: offcanvas on mobile, fixed on desktop -->
+  <aside class="sidebar offcanvas-lg offcanvas-start" id="sidebar" tabindex="-1">
+    <div class="brand">
+      <span class="brand-mark"><i class="bi bi-layers-fill"></i></span>PrepDeck
+      <button class="btn-close d-lg-none ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
+    </div>
+    <nav class="nav-list">
+      <a href="#dashboard" class="nav-item-pd active" data-view="dashboard">
+        <i class="bi bi-grid-1x2"></i>Overview
+      </a>
+      <a href="question-bank.html" class="nav-item-pd">
+        <i class="bi bi-journal-text"></i>Question Bank
+      </a>
+      <a href="attempts.html" class="nav-item-pd">
+        <i class="bi bi-clock-history"></i>My Attempts
+        <span class="badge bg-warning text-dark ms-auto unread-comment-count d-none">0</span>
+      </a>
+      <a href="#progress" class="nav-item-pd" data-view="progress">
+        <i class="bi bi-graph-up-arrow"></i>My Progress
+      </a>
+      <a href="#bookmarks" class="nav-item-pd" data-view="bookmarks">
+        <i class="bi bi-bookmark"></i>Bookmarks
+        <span class="nav-count ms-auto" id="bookmarkNavCount">0</span>
+      </a>
+      <a href="#settings" class="nav-item-pd" data-view="settings">
+        <i class="bi bi-gear"></i>Settings
+      </a>
+    </nav>
+    <a href="student-login.html" class="nav-item-pd logout mt-auto" id="sidebarLogoutBtn">
+      <i class="bi bi-box-arrow-left"></i>Sign Out
+    </a>
+  </aside>
+
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="icon-btn d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Open menu">
+        <i class="bi bi-list"></i>
+      </button>
+      <form class="search" id="searchForm" role="search" autocomplete="off">
+        <i class="bi bi-search"></i>
+        <input type="search" id="searchInput" placeholder="Search 70+ interview questions..." aria-label="Search questions">
+        <div class="search-results d-none" id="searchResults"></div>
+      </form>
+
+      <!-- Notifications dropdown -->
+      <div class="dropdown ms-auto">
+        <button class="icon-btn position-relative" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-label="Notifications" id="notifBtn">
+          <i class="bi bi-bell"></i>
+          <span class="dot" id="notifDot" style="display:none;"></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end pd-menu notif" id="notifMenu">
+          <div class="notif-head">
+            <span>Notifications</span>
+            <button id="markReadBtn" class="btn btn-sm btn-link p-0 text-decoration-none" style="font-size:0.75rem;">Mark all read</button>
+          </div>
+          <div id="notifList"></div>
+        </div>
+      </div>
+
+      <!-- Profile dropdown -->
+      <div class="dropdown">
+        <button class="profile" data-bs-toggle="dropdown">
+          <span class="avatar" id="avatar">NS</span>
+          <span class="d-none d-md-inline name" id="studentName">Nikhil Sharma</span>
+          <i class="bi bi-chevron-down small d-none d-md-inline"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end pd-menu">
+          <li class="px-3 py-2 border-bottom">
+            <div class="fw-bold" id="dropdownUserName">Nikhil Sharma</div>
+            <small class="text-muted" id="dropdownUserRole">Student (3rd-year CSE)</small>
+          </li>
+          <li><a class="dropdown-item" href="#progress" data-view="progress"><i class="bi bi-graph-up-arrow"></i>My Progress</a></li>
+          <li><a class="dropdown-item" href="attempts.html"><i class="bi bi-clock-history"></i>My Attempts</a></li>
+          <li><a class="dropdown-item" href="#bookmarks" data-view="bookmarks"><i class="bi bi-bookmark"></i>Saved Bookmarks</a></li>
+          <li><a class="dropdown-item" href="#settings" data-view="settings"><i class="bi bi-gear"></i>Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="student-login.html" id="dropdownLogoutBtn"><i class="bi bi-box-arrow-left"></i>Sign Out</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- ── DASHBOARD VIEW ────────────────────────────────────── -->
+      <div id="view-dashboard" class="view">
+        <section class="welcome" id="progress-top">
+          <div>
+            <p class="date" id="todayDate">TODAY</p>
+            <h1>Welcome back, <span id="welcomeName">Nikhil</span>! <span class="wave">✦</span></h1>
+            <p class="sub">Your personalized interview prep workspace. Consistent daily practice leads to placement readiness.</p>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="question-bank.html" class="btn btn-pd">
+              <i class="bi bi-plus-circle"></i> Browse Question Bank
+            </a>
+            <a href="attempts.html" class="btn btn-soft">
+              <i class="bi bi-clock-history"></i> My Submissions
+            </a>
+          </div>
+        </section>
+
+        <!-- Stats Grid (PRD S2, US-06) -->
+        <section class="row g-3 stats" id="statsRow">
+          <div class="col-6 col-xl-3">
+            <div class="stat">
+              <div class="stat-icon ic-lav"><i class="bi bi-collection"></i></div>
+              <div>
+                <p class="stat-label">Total Questions</p>
+                <p class="stat-num" id="statTotal">72</p>
+                <p class="stat-note">Across 8 core topics</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="stat">
+              <div class="stat-icon ic-mint"><i class="bi bi-check2-circle"></i></div>
+              <div>
+                <p class="stat-label">Questions Solved</p>
+                <p class="stat-num" id="statSolved">0</p>
+                <p class="stat-note" id="statSolvedPct">0% completion</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="stat">
+              <div class="stat-icon ic-peach"><i class="bi bi-hourglass-split"></i></div>
+              <div>
+                <p class="stat-label">Attempted / In Progress</p>
+                <p class="stat-num" id="statAttempted">0</p>
+                <p class="stat-note" id="statRemaining">72 remaining</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="stat">
+              <div class="stat-icon ic-lav"><i class="bi bi-chat-left-dots"></i></div>
+              <div>
+                <p class="stat-label">Mentor Reviews</p>
+                <p class="stat-num" id="statReviews">0</p>
+                <p class="stat-note" id="statUnreadNotes">0 unread feedback</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Recommended Question Card (PRD Section 2 Promise: Under 30s!) -->
+        <section class="mt-4" id="recommendedSection">
+          <div class="card-pd border-primary" style="border-width: 2px; background: linear-gradient(135deg, #ffffff 0%, #f9f8ff 100%);">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary text-uppercase" style="font-size:0.75rem;"><i class="bi bi-lightning-charge-fill"></i> Recommended Next</span>
+                <span class="text-muted small">Targeted to strengthen your weakest topic in under 30s</span>
+              </div>
+              <span id="recTopicBadge" class="tag">Topic</span>
+            </div>
+            <div class="row align-items-center mt-2">
+              <div class="col-lg-8">
+                <h2 class="h5 fw-bold mb-1" id="recTitle">Loading recommended question...</h2>
+                <p class="text-muted small mb-2" id="recPrompt" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;"></p>
+                <div class="d-flex align-items-center gap-2 flex-wrap" id="recTags"></div>
+              </div>
+              <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <a href="#" id="recStartBtn" class="btn btn-pd">
+                  <i class="bi bi-play-fill"></i> Start Attempt Now
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Main Middle Grid: Topic Progress & Daily Goal / Activity -->
+        <div class="row g-3 mt-1">
+          <div class="col-xl-8">
+            <!-- Overall & Topic Progress (PRD S9) -->
+            <section class="card-pd" id="learning">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 class="h6 fw-bold mb-0">Topic-Wise Progress (8 Core PRD Topics)</h2>
+                <a href="question-bank.html" class="text-primary small fw-bold">View in Bank →</a>
+              </div>
+              <div class="row g-3" id="topicProgressBars"></div>
+
+              <div class="overall mt-4">
+                <div class="row-line">
+                  <span class="fw-bold">Overall Placement Readiness</span>
+                  <span class="pct text-primary" id="overallPct">0%</span>
+                </div>
+                <div class="bar">
+                  <span id="overallBar" style="width: 0%;"></span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Difficulty Breakdown -->
+            <section class="card-pd mt-3">
+              <h2 class="h6 fw-bold mb-3">Difficulty Mastery</h2>
+              <div class="row g-3" id="difficultyBars"></div>
+            </section>
+          </div>
+
+          <div class="col-xl-4">
+            <!-- Daily Goal Card -->
+            <section class="card-pd">
+              <h2 class="h6 fw-bold mb-2">Daily Practice Target</h2>
+              <div id="goalBody"></div>
+            </section>
+
+            <!-- Recent Activity List -->
+            <section class="card-pd mt-3">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h2 class="h6 fw-bold mb-0">Recent Practice Activity</h2>
+                <a href="attempts.html" class="small text-muted">All attempts</a>
+              </div>
+              <ul class="activity" id="activityList"></ul>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MY PROGRESS VIEW ───────────────────────────────────── -->
+      <div id="view-progress" class="view d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h1 class="page-title mb-0">My Learning Progress</h1>
+          <a href="question-bank.html" class="btn btn-pd btn-sm"><i class="bi bi-journal-text"></i> Open Question Bank</a>
+        </div>
+        <div class="card-pd mb-3">
+          <h2>Core Placement Topics</h2>
+          <p class="text-muted small">Track your solved ratio across Arrays, Strings, Searching & Sorting, OOP, DBMS, OS, Computer Networks, and HR.</p>
+          <div class="row g-3" id="fullTopicList"></div>
+        </div>
+        <div class="card-pd">
+          <h2>Questions to Retry (Marked as Struggled)</h2>
+          <p class="text-muted small">Review your previous written solutions and practice again to build confidence.</p>
+          <div class="row g-3" id="struggledQuestionList"></div>
+        </div>
+      </div>
+
+      <!-- ── BOOKMARKS VIEW ────────────────────────────────────── -->
+      <div id="view-bookmarks" class="view d-none">
+        <h1 class="page-title">Saved Bookmarks ("Revise Later")</h1>
+        <p class="text-muted small">Questions you've bookmarked for rapid revision before interviews.</p>
+        <div class="row g-3" id="bookmarkList"></div>
+      </div>
+
+      <!-- ── SETTINGS VIEW ─────────────────────────────────────── -->
+      <div id="view-settings" class="view d-none">
+        <h1 class="page-title">Profile & Settings</h1>
+        <div class="card-pd">
+          <h2>Student Profile</h2>
+          <div class="mb-3">
+            <label class="form-label" for="settingsName">Display Name</label>
+            <input type="text" class="form-control" id="settingsName">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="settingsDailyGoal">Daily Practice Target (Questions / Day)</label>
+            <input type="number" class="form-control" id="settingsDailyGoal" min="1" max="50">
+          </div>
+          <button class="btn btn-pd" id="saveSettingsBtn">Save Profile Settings</button>
+        </div>
+        <div class="card-pd mt-3 border-danger">
+          <h2 class="text-danger">Reset Demo Data</h2>
+          <p class="text-muted">Restore all questions, attempts, and comments back to the original PRD seed data.</p>
+          <button class="btn btn-outline-danger" id="resetDataSettingsBtn">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset Demo Data to Default
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-wrap">
+    <div id="toast" class="toast pd-toast" role="status">
+      <div class="toast-body" id="toastMsg"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/student-dashboard.js"></script>
+</body>
+
+</html>

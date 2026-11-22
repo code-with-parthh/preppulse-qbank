@@ -1,0 +1,129 @@
+{
+  "attempts": [
+    {
+      "id": "at_301",
+      "questionId": "q_arr_004",
+      "userId": "u_nikhil",
+      "status": "solved",
+      "confidence": 3,
+      "timeTakenSec": 1080,
+      "versions": [
+        {
+          "v": 1,
+          "language": "Python",
+          "text": "def longest_subarray_with_sum_k(arr, k):\n    prefix_sum_map = {}\n    current_sum = 0\n    max_len = 0\n    for i, num in enumerate(arr):\n        current_sum += num\n        if current_sum == k:\n            max_len = i + 1\n        if (current_sum - k) in prefix_sum_map:\n            max_len = max(max_len, i - prefix_sum_map[current_sum - k])\n        if current_sum not in prefix_sum_map:\n            prefix_sum_map[current_sum] = i\n    return max_len",
+          "submittedAt": "2026-11-20T10:42:00Z"
+        }
+      ],
+      "reviewStatus": "awaiting",
+      "createdAt": "2026-11-20T10:42:00Z"
+    },
+    {
+      "id": "at_302",
+      "questionId": "q_arr_001",
+      "userId": "u_nikhil",
+      "status": "solved",
+      "confidence": 5,
+      "timeTakenSec": 360,
+      "versions": [
+        {
+          "v": 1,
+          "language": "JavaScript",
+          "text": "function twoSum(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (map.has(complement)) {\n            return [map.get(complement), i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n}",
+          "submittedAt": "2026-11-19T14:15:00Z"
+        }
+      ],
+      "reviewStatus": "approved",
+      "createdAt": "2026-11-19T14:15:00Z"
+    },
+    {
+      "id": "at_303",
+      "questionId": "q_src_001",
+      "userId": "u_fatima",
+      "status": "struggled",
+      "confidence": 2,
+      "timeTakenSec": 900,
+      "versions": [
+        {
+          "v": 1,
+          "language": "Java",
+          "text": "class Solution {\n    public int search(int[] nums, int target) {\n        int low = 0;\n        int high = nums.length - 1;\n        while (low <= high) {\n            int mid = (low + high) / 2;\n            if (nums[mid] == target) return mid;\n            else if (nums[mid] < target) low = mid + 1;\n            else high = mid - 1;\n        }\n        return -1;\n    }\n}",
+          "submittedAt": "2026-11-20T16:00:00Z"
+        }
+      ],
+      "reviewStatus": "needs_revision",
+      "createdAt": "2026-11-20T16:00:00Z"
+    },
+    {
+      "id": "at_304",
+      "questionId": "q_dbms_001",
+      "userId": "u_parth",
+      "status": "solved",
+      "confidence": 4,
+      "timeTakenSec": 720,
+      "versions": [
+        {
+          "v": 1,
+          "language": "SQL",
+          "text": "-- ACID Properties in DBMS Explanation:\n-- 1. Atomicity: Either all operations in a transaction succeed, or all roll back via undo logging.\n-- 2. Consistency: Database transitions strictly between valid schema integrity constraints.\n-- 3. Isolation: Transactions execute without dirty read / non-repeatable read interference.\n-- 4. Durability: Committed data survives crashes via Write-Ahead Logging (WAL) flushed to non-volatile disk.",
+          "submittedAt": "2026-11-21T09:30:00Z"
+        }
+      ],
+      "reviewStatus": "awaiting",
+      "createdAt": "2026-11-21T09:30:00Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "cm_88",
+      "attemptId": "at_301",
+      "authorId": "u_rao",
+      "authorName": "Ms. Rao",
+      "text": "Good use of prefix sums! What happens if the array contains negative numbers? Note that storing only the first occurrence keeps the longest length, which is correct.",
+      "at": "2026-11-20T11:05:00Z",
+      "readByStudent": false
+    },
+    {
+      "id": "cm_89",
+      "attemptId": "at_302",
+      "authorId": "u_rao",
+      "authorName": "Ms. Rao",
+      "text": "Excellent O(N) time and O(N) space solution. Clean single-pass hash map approach. Approved!",
+      "at": "2026-11-19T15:00:00Z",
+      "readByStudent": true
+    },
+    {
+      "id": "cm_90",
+      "attemptId": "at_303",
+      "authorId": "u_rao",
+      "authorName": "Ms. Rao",
+      "text": "Watch out for integer overflow: when low and high are both large, `(low + high)` can exceed Integer.MAX_VALUE. Please revise using `low + (high - low) / 2` and resubmit.",
+      "at": "2026-11-20T17:10:00Z",
+      "readByStudent": false
+    }
+  ],
+  "bookmarks": {
+    "u_nikhil": [
+      "q_arr_004",
+      "q_str_004",
+      "q_oop_004"
+    ],
+    "u_fatima": [
+      "q_arr_001",
+      "q_src_001"
+    ],
+    "u_parth": [
+      "q_dbms_001",
+      "q_os_001"
+    ]
+  },
+  "drafts": {
+    "u_nikhil": {
+      "q_str_004": {
+        "text": "def length_of_longest_substring(s):\n    char_map = {}\n    left = 0\n    max_len = 0\n    # In-progress draft...",
+        "language": "Python",
+        "startedAt": "2026-11-22T10:15:00Z"
+      }
+    }
+  }
+}

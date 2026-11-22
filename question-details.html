@@ -1,4 +1,284 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Question Details | PrepDeck</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"><link href="css/student dashboard.css" rel="stylesheet"></head><body>
-<aside class="sidebar offcanvas-lg offcanvas-start" id="sidebar" tabindex="-1"><div class="brand"><span class="brand-mark"><i class="bi bi-layers-fill"></i></span>PrepDeck<button class="btn-close d-lg-none ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button></div><nav class="nav-list"><a href="student dashboard.html" class="nav-item-pd"><i class="bi bi-grid-1x2"></i>Dashboard</a><a href="question-bank.html" class="nav-item-pd active"><i class="bi bi-journal-text"></i>Question Bank</a><a href="student dashboard.html#progress" class="nav-item-pd"><i class="bi bi-graph-up-arrow"></i>My Progress</a><a href="student dashboard.html#bookmarks" class="nav-item-pd"><i class="bi bi-bookmark"></i>Bookmarks</a></nav></aside>
-<div class="main"><header class="topbar"><button class="icon-btn d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Open menu"><i class="bi bi-list"></i></button><a class="name" href="question-bank.html">← Question Bank</a><span class="ms-auto text-muted small" id="studentName"></span></header><main class="content"><div id="questionDetail"></div></main></div>
-<div class="toast-wrap"><div id="toast" class="toast pd-toast" role="status"><div class="toast-body" id="toastMsg"></div></div></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="js/questions.js"></script><script src="js/prepdeck-data.js"></script><script src="js/question-details.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Question Details & Solution Editor | PrepDeck</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/student-dashboard.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar offcanvas-lg offcanvas-start" id="sidebar" tabindex="-1">
+    <div class="brand">
+      <span class="brand-mark"><i class="bi bi-layers-fill"></i></span>PrepDeck
+      <button class="btn-close d-lg-none ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
+    </div>
+    <nav class="nav-list">
+      <a href="student-dashboard.html" class="nav-item-pd">
+        <i class="bi bi-grid-1x2"></i>Overview
+      </a>
+      <a href="question-bank.html" class="nav-item-pd active">
+        <i class="bi bi-journal-text"></i>Question Bank
+      </a>
+      <a href="attempts.html" class="nav-item-pd">
+        <i class="bi bi-clock-history"></i>My Attempts
+        <span class="badge bg-warning text-dark ms-auto unread-comment-count d-none">0</span>
+      </a>
+      <a href="student-dashboard.html#progress" class="nav-item-pd">
+        <i class="bi bi-graph-up-arrow"></i>My Progress
+      </a>
+      <a href="student-dashboard.html#bookmarks" class="nav-item-pd">
+        <i class="bi bi-bookmark"></i>Bookmarks
+      </a>
+    </nav>
+    <a href="student-login.html" class="nav-item-pd logout mt-auto" data-logout>
+      <i class="bi bi-box-arrow-left"></i>Sign Out
+    </a>
+  </aside>
+
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="icon-btn d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Open menu">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="name text-decoration-none text-dark fw-bold" href="question-bank.html">
+        <i class="bi bi-arrow-left"></i> Back to Question Bank
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="text-muted small d-none d-md-inline" id="studentName">Student</span>
+        <button id="qBookmarkBtn" class="btn btn-outline-secondary btn-sm" aria-label="Bookmark question">
+          <i class="bi bi-bookmark"></i> <span class="d-none d-sm-inline">Bookmark</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Question Navigation & Header -->
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="question-bank.html">Bank</a></li>
+            <li class="breadcrumb-item active" id="breadcrumbTopic">Topic</li>
+            <li class="breadcrumb-item active text-truncate" style="max-width: 250px;" id="breadcrumbTitle">Title</li>
+          </ol>
+        </nav>
+        <div class="d-flex align-items-center gap-2" id="pagerNav">
+          <a href="#" id="prevQuestionBtn" class="btn btn-soft btn-sm"><i class="bi bi-chevron-left"></i> Previous</a>
+          <span class="text-muted small" id="qPagerIndex">Question 1 of 72</span>
+          <a href="#" id="nextQuestionBtn" class="btn btn-soft btn-sm">Next <i class="bi bi-chevron-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Draft Restored Banner (PRD Section 11 UI States) -->
+      <div id="draftRestoredAlert" class="alert alert-info alert-dismissible fade show d-none mb-3" role="alert">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div>
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <span id="draftRestoredMsg">We restored your unsaved draft.</span>
+          </div>
+          <div>
+            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" id="discardDraftBtn" style="font-size:0.75rem;">
+              Discard Draft
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Split View Layout: Question Details (Left) + Solution Editor (Right) -->
+      <div class="split-view">
+        <!-- ── LEFT COLUMN: QUESTION DETAILS (PRD S3) ────────────── -->
+        <div class="card-pd shadow-sm">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+            <div>
+              <span class="tag" id="qTopic">Topic</span>
+              <span class="tag" id="qDifficulty">Difficulty</span>
+              <span id="qMyStatusBadge"></span>
+            </div>
+            <div id="qCompanies"></div>
+          </div>
+
+          <h1 class="h4 fw-bold mt-2 mb-3" id="qTitle">Question Title</h1>
+
+          <div class="mb-4">
+            <h2 class="h6 fw-bold text-muted text-uppercase" style="font-size:0.78rem; letter-spacing:0.5px;">Problem Prompt</h2>
+            <div class="p-3 bg-light rounded-3 text-dark" id="qPrompt" style="line-height:1.7; font-size:0.95rem;"></div>
+          </div>
+
+          <!-- Examples (Input / Output) -->
+          <div class="mb-4">
+            <h2 class="h6 fw-bold text-muted text-uppercase" style="font-size:0.78rem; letter-spacing:0.5px;">Examples</h2>
+            <div id="qExamples"></div>
+          </div>
+
+          <!-- Collapsible Hints (PRD Section 13: Native <details><summary>) -->
+          <div class="mb-4">
+            <h2 class="h6 fw-bold text-muted text-uppercase" style="font-size:0.78rem; letter-spacing:0.5px;">Collapsible Hints</h2>
+            <div class="hint-accordion" id="qHints"></div>
+          </div>
+
+          <!-- Tags -->
+          <div class="mb-4">
+            <h2 class="h6 fw-bold text-muted text-uppercase" style="font-size:0.78rem; letter-spacing:0.5px;">Tags</h2>
+            <div id="qTags"></div>
+          </div>
+
+          <!-- Previous Attempt History on this Question -->
+          <div class="mt-4 pt-3 border-top">
+            <h2 class="h6 fw-bold text-muted text-uppercase mb-2" style="font-size:0.78rem; letter-spacing:0.5px;">Your Previous Attempts</h2>
+            <div id="qAttemptHistory" class="small text-muted">No previous attempts recorded yet.</div>
+          </div>
+        </div>
+
+        <!-- ── RIGHT COLUMN: SOLUTION EDITOR (PRD S4) ───────────── -->
+        <div class="card-pd shadow-sm">
+          <div class="editor-wrapper">
+            <!-- Timer & Actions Toolbar -->
+            <div class="editor-toolbar">
+              <div class="d-flex align-items-center gap-2">
+                <span class="timer-badge" id="timerDisplay">
+                  <i class="bi bi-clock-history"></i> <span id="timerText">00:00</span>
+                </span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="timerToggleBtn" title="Start / Pause attempt timer">
+                  <i class="bi bi-play-fill" id="timerIcon"></i> <span id="timerActionText">Start</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="timerResetBtn" title="Reset timer">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+              </div>
+
+              <!-- Language Selector -->
+              <div class="d-flex align-items-center gap-2">
+                <label for="languageSelect" class="small fw-bold text-muted d-none d-sm-inline">Language:</label>
+                <select id="languageSelect" class="form-select form-select-sm" style="width: auto;">
+                  <option value="Python">Python</option>
+                  <option value="JavaScript">JavaScript</option>
+                  <option value="Java">Java</option>
+                  <option value="C++">C++</option>
+                  <option value="SQL">SQL</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Tab inserts spaces toggle (PRD Section 13: prevents keyboard trap) -->
+            <div class="d-flex justify-content-between align-items-center small text-muted">
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" id="tabKeyToggle" checked>
+                <label class="form-check-label" for="tabKeyToggle" style="font-size:0.78rem;">Tab inserts 4 spaces</label>
+              </div>
+              <span class="draft-badge" id="draftStatusBadge"><i class="bi bi-check2"></i> Ready</span>
+            </div>
+
+            <!-- Monospace Code Editor (PRD Section 13: 15px, 1.5 line height) -->
+            <div>
+              <label for="solutionTextarea" class="visually-hidden">Write your written approach and code solution</label>
+              <textarea id="solutionTextarea" class="code-editor" placeholder="# Write your approach and solution code here...
+# Example:
+# 1. Approach: Explain time and space complexity
+# 2. Code implementation:"></textarea>
+            </div>
+
+            <!-- Footer: Character Counter and Actions -->
+            <div class="editor-footer">
+              <div class="char-counter" id="charCounter">
+                <span id="charCount">0</span> / 5,000 characters
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="saveDraftBtn">
+                  <i class="bi bi-cloud-arrow-up"></i> Save Draft
+                </button>
+                <button type="button" class="btn btn-pd" id="openSubmitModalBtn">
+                  <i class="bi bi-send-fill"></i> Submit for Review
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Submit Attempt Modal (PRD S4: Status Solved/Struggled/Skipped, Confidence 1-5) -->
+  <div class="modal fade" id="submitAttemptModal" tabindex="-1" aria-labelledby="submitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content card-pd border-0 p-4">
+        <div class="modal-header border-0 pb-0 pt-0 px-0">
+          <h2 class="h5 fw-bold modal-title" id="submitModalLabel">Submit Solution for Review</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body px-0 py-3">
+          <p class="text-muted small mb-3">
+            Your written solution will be submitted to the mentor queue for feedback. Record your self-assessment below.
+          </p>
+
+          <!-- Self-Assessed Practice Status -->
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">How did this attempt go?</label>
+            <div class="d-flex gap-2">
+              <div class="form-check border rounded-3 p-2 px-3 flex-fill">
+                <input class="form-check-input" type="radio" name="attemptStatusRadio" id="statusRadioSolved" value="solved" checked>
+                <label class="form-check-label fw-bold text-success" for="statusRadioSolved">
+                  <i class="bi bi-check-circle-fill"></i> Solved
+                </label>
+              </div>
+              <div class="form-check border rounded-3 p-2 px-3 flex-fill">
+                <input class="form-check-input" type="radio" name="attemptStatusRadio" id="statusRadioStruggled" value="struggled">
+                <label class="form-check-label fw-bold text-warning" for="statusRadioStruggled">
+                  <i class="bi bi-hourglass-split"></i> Struggled
+                </label>
+              </div>
+              <div class="form-check border rounded-3 p-2 px-3 flex-fill">
+                <input class="form-check-input" type="radio" name="attemptStatusRadio" id="statusRadioSkipped" value="skipped">
+                <label class="form-check-label fw-bold text-secondary" for="statusRadioSkipped">
+                  <i class="bi bi-skip-forward-fill"></i> Skipped
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confidence Rating (1 to 5) -->
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Confidence Level (1 - 5 stars)</label>
+            <div class="d-flex align-items-center gap-2" id="confidenceStarRating">
+              <button type="button" class="btn btn-sm btn-outline-warning star-btn active" data-val="1">★ 1</button>
+              <button type="button" class="btn btn-sm btn-outline-warning star-btn active" data-val="2">★ 2</button>
+              <button type="button" class="btn btn-sm btn-outline-warning star-btn active" data-val="3">★ 3</button>
+              <button type="button" class="btn btn-sm btn-outline-warning star-btn" data-val="4">★ 4</button>
+              <button type="button" class="btn btn-sm btn-outline-warning star-btn" data-val="5">★ 5</button>
+              <input type="hidden" id="confidenceValue" value="3">
+            </div>
+          </div>
+
+          <!-- Time Recorded -->
+          <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Recorded Time Taken:</span>
+            <span class="fw-bold font-monospace text-primary" id="modalTimeTakenDisplay">00:00</span>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0 px-0">
+          <button type="button" class="btn btn-soft" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-pd" id="confirmSubmitBtn">
+            <i class="bi bi-send-check-fill"></i> Submit for Mentor Review
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-wrap">
+    <div id="toast" class="toast pd-toast" role="status">
+      <div class="toast-body" id="toastMsg"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/question-details.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Submission & Mentor Review | PrepDeck</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/student-dashboard.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar offcanvas-lg offcanvas-start" id="sidebar" tabindex="-1">
+    <div class="brand">
+      <span class="brand-mark"><i class="bi bi-layers-fill"></i></span>PrepDeck
+      <button class="btn-close d-lg-none ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
+    </div>
+    <nav class="nav-list" id="sidebarNavList">
+      <!-- Will dynamically populate based on role (student vs mentor) -->
+    </nav>
+    <a href="index.html" class="nav-item-pd logout mt-auto">
+      <i class="bi bi-house"></i>Home
+    </a>
+  </aside>
+
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="icon-btn d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Open menu">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="name text-decoration-none text-dark fw-bold" id="backLink" href="attempts.html">
+        <i class="bi bi-arrow-left"></i> <span id="backLinkText">Back to Attempts</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="badge bg-secondary" id="userRoleBadge">Student View</span>
+        <span class="text-muted small d-none d-md-inline" id="userDisplayName">User</span>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Submission Header Bar -->
+      <div class="card-pd mb-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="tag" id="subTopic">Topic</span>
+              <span class="tag" id="subDifficulty">Difficulty</span>
+              <span id="subReviewBadge"></span>
+            </div>
+            <h1 class="h4 fw-bold mb-1" id="subQuestionTitle">Question Title</h1>
+            <div class="text-muted small">
+              Submitted by <strong id="subStudentName" class="text-dark">Student</strong> •
+              <span id="subCreatedAt">Date</span> •
+              Time Taken: <strong id="subTimeTaken" class="font-monospace text-primary">18m</strong> •
+              Confidence: <strong id="subConfidence" class="text-warning">3/5</strong>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2" id="headerActionButtons">
+            <!-- Dynamic actions (Revise for Student / Review status for Mentor) -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Split View Layout (PRD Section 12: Split on laptop, stacked on phone) -->
+      <div class="split-view">
+        <!-- ── LEFT: QUESTION CONTEXT (PRD S6) ───────────────────── -->
+        <div class="card-pd shadow-sm">
+          <h2 class="h6 fw-bold text-muted text-uppercase mb-3" style="font-size:0.78rem; letter-spacing:0.5px;">Original Question Prompt</h2>
+          <div class="p-3 bg-light rounded-3 text-dark mb-4" id="subPrompt" style="line-height:1.7; font-size:0.95rem;"></div>
+
+          <h2 class="h6 fw-bold text-muted text-uppercase mb-2" style="font-size:0.78rem; letter-spacing:0.5px;">Examples & Edge Cases</h2>
+          <div id="subExamples" class="mb-4"></div>
+
+          <h2 class="h6 fw-bold text-muted text-uppercase mb-2" style="font-size:0.78rem; letter-spacing:0.5px;">Hints</h2>
+          <div class="hint-accordion mb-3" id="subHints"></div>
+        </div>
+
+        <!-- ── RIGHT: SOLUTION VERSIONS & MENTOR COMMENTS ────────── -->
+        <div class="d-flex flex-column gap-3">
+          <!-- Solution Code Box with Version Tabs (PRD S6) -->
+          <div class="card-pd shadow-sm">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <h2 class="h6 fw-bold mb-0">Submitted Solution</h2>
+                <span class="badge bg-light text-muted border" id="subLanguageBadge">Python</span>
+              </div>
+              <!-- Version Tabs (v1, v2) -->
+              <div class="version-tabs mb-0" id="versionTabsContainer"></div>
+            </div>
+
+            <!-- Code Display -->
+            <pre class="code-editor mb-2" style="min-height: 260px; max-height: 480px; overflow-y: auto;" id="solutionCodeDisplay"></pre>
+
+            <div class="d-flex justify-content-between align-items-center text-muted small mt-2">
+              <span id="versionTimestamp">Submitted on ...</span>
+              <button class="btn btn-sm btn-outline-secondary py-0 px-2" id="copyCodeBtn" style="font-size:0.75rem;">
+                <i class="bi bi-clipboard"></i> Copy Code
+              </button>
+            </div>
+          </div>
+
+          <!-- Revise Solution In-Place Editor (Student Action - PRD US-05) -->
+          <div class="card-pd shadow-sm d-none" id="revisionEditorSection" style="border-color: #5546d8; border-width: 2px;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h6 fw-bold text-primary mb-0"><i class="bi bi-pencil-square"></i> Revise Solution (Create Next Version)</h2>
+              <button type="button" class="btn-close" id="closeRevisionBtn" aria-label="Close revision"></button>
+            </div>
+            <p class="text-muted small mb-2">
+              Update your approach based on mentor feedback. Submitting will create a new version while preserving previous versions.
+            </p>
+
+            <textarea id="revisionTextarea" class="code-editor" style="min-height: 220px;" placeholder="Revise your solution here..."></textarea>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="d-flex align-items-center gap-2">
+                <label for="revisionStatusSelect" class="small text-muted fw-bold">My Status:</label>
+                <select id="revisionStatusSelect" class="form-select form-select-sm" style="width: auto;">
+                  <option value="solved">Solved</option>
+                  <option value="struggled">Struggled</option>
+                </select>
+              </div>
+              <button type="button" class="btn btn-pd btn-sm" id="submitRevisionBtn">
+                <i class="bi bi-arrow-up-circle"></i> Submit Revision (v<span id="nextVersionNum">2</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Mentor Comment Thread (PRD S6, US-08) -->
+          <div class="card-pd shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h6 fw-bold mb-0"><i class="bi bi-chat-quote-fill text-primary"></i> Mentor Comments & Feedback</h2>
+              <span class="badge bg-light text-muted border" id="commentCountBadge">0 comments</span>
+            </div>
+
+            <div class="comment-thread" id="commentThreadList">
+              <p class="text-muted small mb-0">No mentor comments recorded yet.</p>
+            </div>
+
+            <!-- Mentor Reply / Review Form (Only visible to Mentors) -->
+            <div class="mt-4 pt-3 border-top" id="mentorReviewFormSection">
+              <h3 class="h6 fw-bold mb-2">Leave Mentor Feedback</h3>
+              <textarea id="mentorCommentInput" class="form-control mb-3" rows="3" placeholder="Provide constructive feedback, edge cases to consider, or optimization suggestions..."></textarea>
+
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="small fw-bold text-muted">Update Review Decision:</span>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <input type="radio" class="btn-check" name="mentorDecisionRadio" id="decApprove" value="approved">
+                    <label class="btn btn-outline-success" for="decApprove"><i class="bi bi-check-circle-fill"></i> Approve</label>
+
+                    <input type="radio" class="btn-check" name="mentorDecisionRadio" id="decRevision" value="needs_revision" checked>
+                    <label class="btn btn-outline-warning text-dark" for="decRevision"><i class="bi bi-exclamation-triangle-fill"></i> Needs Revision</label>
+                  </div>
+                </div>
+
+                <button type="button" class="btn btn-pd btn-sm" id="submitMentorFeedbackBtn">
+                  <i class="bi bi-send-fill"></i> Post Comment & Submit Review
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-wrap">
+    <div id="toast" class="toast pd-toast" role="status">
+      <div class="toast-body" id="toastMsg"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const esc = Components.esc;
+      const session = Storage.getSession();
+      const currentUser = Storage.getCurrentUser();
+      const isMentor = session.role === 'mentor';
+
+      const params = new URLSearchParams(window.location.search);
+      const attemptId = params.get('id');
+      const attempt = Storage.getAttemptById(attemptId);
+
+      if (!attempt) {
+        alert('Attempt not found. Returning to previous page.');
+        window.location.href = isMentor ? 'mentor-dashboard.html' : 'attempts.html';
+        return;
+      }
+
+      // Privacy Check: Students can only view their own attempts (PRD US-10)
+      if (!isMentor && attempt.userId !== currentUser.id) {
+        alert('Access Restricted: You do not have permission to view another student\'s private attempts.');
+        window.location.href = 'attempts.html';
+        return;
+      }
+
+      // If student opens this attempt, automatically mark comments as read (PRD Acceptance Criteria #6)
+      if (!isMentor) {
+        Storage.markCommentsReadForAttempt(attempt.id);
+        Components.updateUnreadBadges();
+      }
+
+      const question = Storage.getQuestionById(attempt.questionId);
+      const student = Storage.getUserById(attempt.userId);
+
+      // Render Topbar & Back Link
+      const backLink = document.getElementById('backLink');
+      const backText = document.getElementById('backLinkText');
+      if (isMentor) {
+        backLink.href = 'mentor-dashboard.html#queue';
+        backText.textContent = 'Back to Mentor Review Queue';
+        document.getElementById('userRoleBadge').className = 'badge bg-warning text-dark';
+        document.getElementById('userRoleBadge').textContent = 'Mentor Review Mode';
+      } else {
+        backLink.href = 'attempts.html';
+        backText.textContent = 'Back to My Attempts';
+        document.getElementById('userRoleBadge').className = 'badge bg-primary text-white';
+        document.getElementById('userRoleBadge').textContent = 'Student Submission View';
+      }
+      document.getElementById('userDisplayName').textContent = currentUser.name;
+
+      // Render Sidebar Navigation depending on role
+      const navList = document.getElementById('sidebarNavList');
+      if (isMentor) {
+        navList.innerHTML = `
+          <a href="mentor-dashboard.html#overview" class="nav-item-pd"><i class="bi bi-speedometer2"></i>Overview</a>
+          <a href="mentor-dashboard.html#queue" class="nav-item-pd active"><i class="bi bi-inbox-fill"></i>Review Queue</a>
+          <a href="mentor-dashboard.html#submissions" class="nav-item-pd"><i class="bi bi-clock-history"></i>All Submissions</a>
+          <a href="mentor-dashboard.html#students" class="nav-item-pd"><i class="bi bi-people-fill"></i>Students</a>
+          <a href="mentor-dashboard.html#questions" class="nav-item-pd"><i class="bi bi-journal-text"></i>Question Management</a>
+        `;
+      } else {
+        navList.innerHTML = `
+          <a href="student-dashboard.html" class="nav-item-pd"><i class="bi bi-grid-1x2"></i>Overview</a>
+          <a href="question-bank.html" class="nav-item-pd"><i class="bi bi-journal-text"></i>Question Bank</a>
+          <a href="attempts.html" class="nav-item-pd active"><i class="bi bi-clock-history"></i>My Attempts</a>
+          <a href="student-dashboard.html#progress" class="nav-item-pd"><i class="bi bi-graph-up-arrow"></i>My Progress</a>
+          <a href="student-dashboard.html#bookmarks" class="nav-item-pd"><i class="bi bi-bookmark"></i>Bookmarks</a>
+        `;
+      }
+
+      // Render Question Details
+      if (question) {
+        document.title = `${question.title} - Submission | PrepDeck`;
+        document.getElementById('subTopic').textContent = question.topic;
+        const diffEl = document.getElementById('subDifficulty');
+        diffEl.textContent = question.difficulty;
+        diffEl.className = `tag d-${question.difficulty}`;
+        document.getElementById('subQuestionTitle').textContent = question.title;
+        document.getElementById('subPrompt').textContent = question.prompt;
+
+        // Examples
+        const exEl = document.getElementById('subExamples');
+        if (Array.isArray(question.examples) && question.examples.length) {
+          exEl.innerHTML = question.examples.map((ex, idx) => `
+            <div class="p-2 px-3 bg-light rounded-3 border mb-2 font-monospace small">
+              <strong>Input:</strong> ${esc(ex.input)}<br>
+              <strong>Output:</strong> ${esc(ex.output)}
+            </div>
+          `).join('');
+        }
+
+        // Hints
+        const hintsEl = document.getElementById('subHints');
+        if (Array.isArray(question.hints) && question.hints.length) {
+          hintsEl.innerHTML = question.hints.map((h, idx) => `
+            <details>
+              <summary>Hint ${idx + 1}</summary>
+              <p>${esc(h)}</p>
+            </details>
+          `).join('');
+        }
+      }
+
+      // Render Metadata
+      document.getElementById('subStudentName').textContent = student ? student.name : 'Student';
+      document.getElementById('subCreatedAt').textContent = new Date(attempt.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+      document.getElementById('subTimeTaken').textContent = `${Math.round((attempt.timeTakenSec || 60) / 60)} min`;
+      document.getElementById('subConfidence').textContent = `${'★'.repeat(attempt.confidence || 3)} (${attempt.confidence || 3}/5)`;
+
+      function updateReviewBadge() {
+        const badgeEl = document.getElementById('subReviewBadge');
+        if (attempt.reviewStatus === 'approved') {
+          badgeEl.innerHTML = '<span class="badge-status badge-status-approved"><i class="bi bi-check-circle-fill"></i> Approved</span>';
+        } else if (attempt.reviewStatus === 'needs_revision') {
+          badgeEl.innerHTML = '<span class="badge-status badge-status-needs_revision"><i class="bi bi-exclamation-triangle-fill"></i> Needs Revision</span>';
+        } else {
+          badgeEl.innerHTML = '<span class="badge-status badge-status-awaiting"><i class="bi bi-hourglass-split"></i> Awaiting Mentor Review</span>';
+        }
+      }
+      updateReviewBadge();
+
+      // Render Header Action Buttons
+      const actionsEl = document.getElementById('headerActionButtons');
+      if (isMentor) {
+        actionsEl.innerHTML = `
+          <button type="button" class="btn btn-outline-success btn-sm quick-review-btn" data-status="approved">
+            <i class="bi bi-check-circle"></i> Quick Approve
+          </button>
+          <button type="button" class="btn btn-outline-warning text-dark btn-sm quick-review-btn" data-status="needs_revision">
+            <i class="bi bi-exclamation-triangle"></i> Quick Request Revision
+          </button>
+        `;
+        actionsEl.querySelectorAll('.quick-review-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const status = btn.getAttribute('data-status');
+            const comment = status === 'approved' ? 'Solution approved. Great approach!' : 'Please review and optimize your solution.';
+            Storage.addComment({
+              attemptId: attempt.id,
+              authorId: currentUser.id,
+              text: comment,
+              reviewStatus: status
+            });
+            attempt.reviewStatus = status;
+            updateReviewBadge();
+            renderComments();
+            Components.showToast(`Submission marked as ${status.replace('_', ' ').toUpperCase()}!`);
+          });
+        });
+      } else {
+        // Student: Revise Solution Button
+        actionsEl.innerHTML = `
+          <button type="button" class="btn btn-pd btn-sm" id="openRevisionBtn">
+            <i class="bi bi-pencil-square"></i> Revise Solution
+          </button>
+        `;
+        document.getElementById('openRevisionBtn')?.addEventListener('click', () => {
+          const revSection = document.getElementById('revisionEditorSection');
+          revSection.classList.remove('d-none');
+          // Pre-populate with current version code
+          const latestVersion = attempt.versions[attempt.versions.length - 1];
+          document.getElementById('revisionTextarea').value = latestVersion ? latestVersion.text : '';
+          document.getElementById('nextVersionNum').textContent = attempt.versions.length + 1;
+          revSection.scrollIntoView({ behavior: 'smooth' });
+        });
+      }
+
+      // ── Versions Tab Management (PRD S6: v1, v2) ─────────────────
+      let activeVersionIndex = attempt.versions.length - 1;
+
+      function renderVersions() {
+        const tabsContainer = document.getElementById('versionTabsContainer');
+        const versions = attempt.versions || [];
+
+        tabsContainer.innerHTML = versions.map((v, idx) => `
+          <button type="button" class="version-tab-btn ${idx === activeVersionIndex ? 'active' : ''}" data-idx="${idx}">
+            Version ${v.v || (idx + 1)}
+          </button>
+        `).join('');
+
+        tabsContainer.querySelectorAll('.version-tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            activeVersionIndex = parseInt(btn.getAttribute('data-idx'), 10);
+            renderVersions();
+          });
+        });
+
+        const curVer = versions[activeVersionIndex] || versions[0];
+        document.getElementById('solutionCodeDisplay').textContent = curVer ? curVer.text : '// No solution text';
+        document.getElementById('subLanguageBadge').textContent = curVer ? curVer.language : 'Code';
+        document.getElementById('versionTimestamp').textContent = curVer && curVer.submittedAt ?
+          `Version ${curVer.v} submitted on ${new Date(curVer.submittedAt).toLocaleString()}` : '';
+      }
+      renderVersions();
+
+      // Copy code button
+      document.getElementById('copyCodeBtn')?.addEventListener('click', () => {
+        const curVer = attempt.versions[activeVersionIndex];
+        if (curVer && curVer.text) {
+          navigator.clipboard.writeText(curVer.text);
+          Components.showToast('Solution code copied to clipboard!');
+        }
+      });
+
+      // ── Revision Handler (Student Action) ──────────────────────
+      document.getElementById('closeRevisionBtn')?.addEventListener('click', () => {
+        document.getElementById('revisionEditorSection').classList.add('d-none');
+      });
+
+      document.getElementById('submitRevisionBtn')?.addEventListener('click', () => {
+        const newText = document.getElementById('revisionTextarea').value.trim();
+        if (!newText) {
+          Components.showToast('Please write your revised code before submitting.');
+          return;
+        }
+        const newStatus = document.getElementById('revisionStatusSelect').value;
+        const updated = Storage.reviseAttempt(attempt.id, {
+          text: newText,
+          status: newStatus
+        });
+        document.getElementById('revisionEditorSection').classList.add('d-none');
+        activeVersionIndex = updated.versions.length - 1;
+        renderVersions();
+        updateReviewBadge();
+        Components.showToast(`Revision submitted as Version ${updated.versions.length}! Awaiting mentor review. ✦`);
+      });
+
+      // ── Comment Thread Management (PRD S6, US-08) ───────────────
+      function renderComments() {
+        const comments = Storage.getComments(attempt.id);
+        const threadList = document.getElementById('commentThreadList');
+        document.getElementById('commentCountBadge').textContent = `${comments.length} comment${comments.length === 1 ? '' : 's'}`;
+
+        if (!comments.length) {
+          threadList.innerHTML = '<p class="text-muted small mb-0">No mentor feedback recorded yet. Comments will appear here.</p>';
+          return;
+        }
+
+        threadList.innerHTML = comments.map(c => `
+          <div class="comment-card mentor-comment">
+            <div class="comment-author justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <span class="avatar" style="width:28px;height:28px;font-size:0.75rem;">MR</span>
+                <strong>${esc(c.authorName || 'Mentor')}</strong>
+                <span class="badge bg-warning text-dark" style="font-size:0.68rem;">Mentor</span>
+              </div>
+              <small class="text-muted">${new Date(c.at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</small>
+            </div>
+            <p class="mb-0 text-dark small" style="line-height:1.6; white-space:pre-wrap;">${esc(c.text)}</p>
+          </div>
+        `).join('');
+      }
+      renderComments();
+
+      // Show mentor review form only if current user is mentor
+      const mentorForm = document.getElementById('mentorReviewFormSection');
+      if (mentorForm) {
+        if (!isMentor) {
+          mentorForm.style.display = 'none';
+        } else {
+          mentorForm.style.display = 'block';
+          document.getElementById('submitMentorFeedbackBtn')?.addEventListener('click', () => {
+            const commentText = document.getElementById('mentorCommentInput').value.trim();
+            if (!commentText) {
+              Components.showToast('Please type a feedback comment before submitting review.');
+              return;
+            }
+            const decisionRadio = document.querySelector('input[name="mentorDecisionRadio"]:checked');
+            const reviewStatus = decisionRadio ? decisionRadio.value : 'needs_revision';
+
+            Storage.addComment({
+              attemptId: attempt.id,
+              authorId: currentUser.id,
+              text: commentText,
+              reviewStatus: reviewStatus
+            });
+
+            attempt.reviewStatus = reviewStatus;
+            document.getElementById('mentorCommentInput').value = '';
+            renderComments();
+            updateReviewBadge();
+            Components.showToast(`Feedback posted and status set to ${reviewStatus.replace('_', ' ').toUpperCase()}! ✦`);
+          });
+        }
+      }
+
+    })();
+  </script>
+</body>
+
+</html>

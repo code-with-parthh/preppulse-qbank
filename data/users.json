@@ -1,0 +1,42 @@
+[
+  {
+    "id": "u_nikhil",
+    "username": "student1",
+    "name": "Nikhil Sharma",
+    "role": "student",
+    "avatar": "NS",
+    "email": "nikhil@prepdeck.io",
+    "password": "123",
+    "title": "3rd-year CSE \u2022 Product Track"
+  },
+  {
+    "id": "u_fatima",
+    "username": "student2",
+    "name": "Fatima Khan",
+    "role": "student",
+    "avatar": "FK",
+    "email": "fatima@prepdeck.io",
+    "password": "123",
+    "title": "1st-year Core \u2022 Basics Track"
+  },
+  {
+    "id": "u_parth",
+    "username": "student3",
+    "name": "Parth Parmar",
+    "role": "student",
+    "avatar": "PP",
+    "email": "parth@prepdeck.io",
+    "password": "123",
+    "title": "Semester 1 OJT \u2022 Full-Stack Track"
+  },
+  {
+    "id": "u_rao",
+    "username": "mentor1",
+    "name": "Ms. Rao",
+    "role": "mentor",
+    "avatar": "MR",
+    "email": "rao@prepdeck.io",
+    "password": "123",
+    "title": "Senior Staff Engineer & Mentor"
+  }
+]
